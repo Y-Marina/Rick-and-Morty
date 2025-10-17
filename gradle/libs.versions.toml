@@ -9,6 +9,15 @@ lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
 composeBom = "2024.09.00"
 
+material = "1.7.3"
+materialExtended = "1.7.8"
+navigation = "2.9.5"
+constraintlayout = "1.1.1"
+
+hilt-version = "2.57.2"
+
+timber = "5.0.1"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,8 +34,22 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+material-icon_core = {group = "org.jetbrains.compose.material", name = "material-icons-core", version.ref = "material" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialExtended" }
+androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+androidx-constraintlayout = { group ="androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayout" }
+
+# Dagger-Hilt
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt-version" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt-version" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.3.0" }
+
+# Timber
+com-jakewharton-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-version" }
