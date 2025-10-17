@@ -64,6 +64,11 @@ dependencies {
 
     implementation(libs.com.jakewharton.timber)
 
+    implementation(libs.squareup.retrofit2)
+    implementation(libs.squareup.converter.json)
+    implementation(libs.com.squareup.okhttp3)
+    implementation(libs.com.squareup.logging.interceptor)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
