@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.marina.rickandmorty.characterslist.CharactersListScreen
 import com.marina.rickandmorty.ui.theme.RickAndMortyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,21 +38,23 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         modifier = Modifier.padding(innerPadding),
                         navController = navController,
-                        startDestination = "home_screen"
+                        startDestination = "characters_list_screen"
                     ) {
-                        composable("home_screen") { }
-                        composable(
-                            "character_detail_screen/{characterName}",
-                            arguments = listOf(
-                                navArgument("characterName") {
-                                    type = NavType.StringType
-                                }
-                            )
-                        ) {
-                            val characterName = remember {
-                                it.arguments?.getString("characterName")
-                            }
+                        composable("characters_list_screen") {
+                            CharactersListScreen(navController = navController)
                         }
+//                        composable(
+//                            "character_detail_screen/{characterName}",
+//                            arguments = listOf(
+//                                navArgument("characterName") {
+//                                    type = NavType.StringType
+//                                }
+//                            )
+//                        ) {
+//                            val characterName = remember {
+//                                it.arguments?.getString("characterName")
+//                            }
+//                        }
                     }
                 }
             }
