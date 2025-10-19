@@ -9,7 +9,7 @@ data class CharactersListDto(
     val info: InfoDto,
 
     @SerialName("results")
-    val results: ResultsDto
+    val results: List<CharacterDto>
 )
 
 @Serializable
@@ -21,14 +21,14 @@ data class InfoDto(
     val pages: Int,
 
     @SerialName("next")
-    val next: String,
+    val next: String?,
 
     @SerialName("prev")
-    val prev: String
+    val prev: String?
 )
 
 @Serializable
-data class ResultsDto(
+data class CharacterDto(
     @SerialName("id")
     val id: Int,
 
@@ -57,7 +57,7 @@ data class ResultsDto(
     val image: String,
 
     @SerialName("episode")
-    val episode: String,
+    val episode: List<String>,
 
     @SerialName("url")
     val url: String,

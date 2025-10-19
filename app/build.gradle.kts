@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     implementation(libs.hilt.android)
+    implementation(libs.androidx.material3)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
@@ -68,6 +69,13 @@ dependencies {
     implementation(libs.squareup.converter.json)
     implementation(libs.com.squareup.okhttp3)
     implementation(libs.com.squareup.logging.interceptor)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
+    implementation(libs.com.google.accompanist)
+
+    implementation(libs.org.jetbrains.kotlinx.coroutines)
+    implementation(libs.org.jetbrains.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
