@@ -10,7 +10,9 @@ import com.marina.rickandmorty.util.Constants.PAGE_SIZE
 import com.marina.rickandmorty.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import kotlin.collections.plus
 
 @HiltViewModel
@@ -24,12 +26,38 @@ class CharactersListViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
-    private var cachedPokemonList = listOf<CharactersList>()
+    private var cachedList = listOf<Character>()
     private var isSearchStarting = true
     var isSearching = mutableStateOf(false)
 
     init {
         loadCharacterPaginated()
+    }
+
+    fun searchCharacter(query: String) {
+        val listToSearch = if (isSearchStarting) {
+            charactersList.value
+        } else {
+            cachedList
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            if (query.isEmpty()) {
+                charactersList.value = cachedList
+                isSearching.value = false
+                isSearchStarting = true
+                return@launch
+            }
+            val results = listToSearch.filter {
+                it.name.contains(query.trim(), ignoreCase = true)
+            }
+            if (isSearchStarting) {
+                cachedList = charactersList.value
+                isSearchStarting = false
+            }
+            charactersList.value = results
+            isSearching.value = true
+        }
     }
 
     fun loadCharacterPaginated() {

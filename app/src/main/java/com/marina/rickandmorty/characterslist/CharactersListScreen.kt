@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +54,8 @@ import com.marina.rickandmorty.data.models.Character
 
 @Composable
 fun CharactersListScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: CharactersListViewModel = hiltViewModel<CharactersListViewModel>()
 ) {
     Surface(
         color = MaterialTheme.colorScheme.background,
@@ -73,7 +75,10 @@ fun CharactersListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-            ) {}
+            ) {
+                viewModel.searchCharacter(it)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             CharactersList(navController)
         }
     }
@@ -133,35 +138,61 @@ fun CharactersList(
     val isLoading by remember { viewModel.isLoading }
     val isSearching by remember { viewModel.isSearching }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(charactersList.size) {
-            if (it >= charactersList.size - 1 && !endReached && !isLoading && !isSearching) {
-                viewModel.loadCharacterPaginated()
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(charactersList.size) {
+                if (it >= charactersList.size - 1 && !endReached && !isLoading && !isSearching) {
+                    viewModel.loadCharacterPaginated()
+                }
+                CharactersEntry(
+                    entry = charactersList[it],
+                    navController = navController
+                )
             }
-            CharactersEntry(
-                entry = charactersList[it],
-                navController = navController
-            )
+            if (isLoading) {
+                item(
+                    span = { GridItemSpan(2) }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .height(80.dp)
+                            .fillMaxWidth()
+                            .weight(2f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color.Red
+                        )
+                    }
+                }
+            }
+            if (loadError.isNotEmpty() && !isLoading) {
+                item(
+                    span = { GridItemSpan(2) }
+                ) {
+                    RetrySection(error = loadError) {
+                        viewModel.loadCharacterPaginated()
+                    }
+                }
+            }
         }
-    }
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        if (isLoading) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-        }
-        if (loadError.isNotEmpty()) {
-            RetrySection(error = loadError) {
-                viewModel.loadCharacterPaginated()
-            }
-        }
+//        Box(
+//            contentAlignment = Alignment.Center,
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//
+//        }
     }
 }
 
