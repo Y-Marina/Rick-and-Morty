@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marina.rickandmorty.data.models.Character
-import com.marina.rickandmorty.data.models.CharactersList
 import com.marina.rickandmorty.repository.CharacterRepository
 import com.marina.rickandmorty.util.Constants.PAGE_SIZE
 import com.marina.rickandmorty.util.Resource
@@ -12,8 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
-import kotlin.collections.plus
 
 @HiltViewModel
 class CharactersListViewModel @Inject constructor(
@@ -64,7 +61,6 @@ class CharactersListViewModel @Inject constructor(
         viewModelScope.launch {
             isLoading.value = true
             val result = repository.getCharacterList(curPage)
-            println("myTag result = $result")
             when (result) {
                 is Resource.Success -> {
                     endReached.value = curPage * PAGE_SIZE >= result.data!!.info.count
@@ -79,6 +75,11 @@ class CharactersListViewModel @Inject constructor(
                 is Resource.Error -> {
                     loadError.value = result.message!!
                     isLoading.value = false
+                }
+
+                is Resource.Loading -> {
+                    loadError.value = ""
+                    isLoading.value = true
                 }
             }
         }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -186,13 +185,6 @@ fun CharactersList(
                 }
             }
         }
-
-//        Box(
-//            contentAlignment = Alignment.Center,
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//
-//        }
     }
 }
 
@@ -210,7 +202,7 @@ fun CharactersEntry(
             .clip(RoundedCornerShape(15.dp))
             .clickable {
                 navController.navigate(
-                    "character_detail_screen/${entry.name}"
+                    "character_detail_screen/${entry.id}"
                 )
             }
     ) {
@@ -237,8 +229,6 @@ fun CharactersEntry(
                     },
                     modifier = Modifier
                         .fillMaxHeight()
-//                    .aspectRatio(1f)
-//                    .align(Alignment.Center)
                 )
                 Box(
                     modifier = Modifier
@@ -250,7 +240,6 @@ fun CharactersEntry(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-
                         text = entry.status,
                         fontSize = 14.sp,
                         color = Color.White,
