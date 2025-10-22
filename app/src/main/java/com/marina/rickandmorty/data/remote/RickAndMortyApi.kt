@@ -13,7 +13,8 @@ interface RickAndMortyApi {
         @Query("name") name: String = "",
         @Query("status") status: String = "",
         @Query("species") species: String = "",
-        @Query("type") type: String = ""
+        @Query("type") type: String = "",
+        @Query("gender") gender: String = ""
     ): CharactersListDto
 
     @GET("character/{id}")

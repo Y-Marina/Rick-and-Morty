@@ -61,11 +61,12 @@ class CharactersListViewModel @Inject constructor(
         name: String = "",
         status: String = "",
         species: String = "",
-        type: String = ""
+        type: String = "",
+        gender: String = ""
     ) {
         viewModelScope.launch {
             isLoading.value = true
-            val result = repository.getCharacterList(curPage, name, status, species, type)
+            val result = repository.getCharacterList(curPage, name, status, species, type, gender)
             when (result) {
                 is Resource.Success -> {
                     endReached.value = curPage * PAGE_SIZE >= result.data!!.info.count
@@ -94,10 +95,11 @@ class CharactersListViewModel @Inject constructor(
         name: String = "",
         status: String = "",
         species: String = "",
-        type: String = ""
+        type: String = "",
+        gender: String = ""
     ) {
         curPage = 1
         charactersList.value = emptyList()
-        loadCharacterPaginated(name, status, species)
+        loadCharacterPaginated(name, status, species, type, gender)
     }
 }

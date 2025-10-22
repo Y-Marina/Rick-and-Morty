@@ -3,6 +3,7 @@ package com.marina.rickandmorty.characterslist
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -77,7 +79,7 @@ fun CharactersListScreen(
         mutableStateOf("")
     }
 
-    var selectedIndex by remember {
+    var selectedStatusIndex by remember {
         mutableIntStateOf(-1)
     }
 
@@ -90,6 +92,12 @@ fun CharactersListScreen(
     var type by remember {
         mutableStateOf("")
     }
+
+    var selectedGenderIndex by remember {
+        mutableIntStateOf(-1)
+    }
+
+    val gender = listOf("female", "male", "genderless", "unknown")
 
     Scaffold(
         floatingActionButton = {
@@ -184,18 +192,18 @@ fun CharactersListScreen(
                             .fillMaxWidth()
                             .padding(6.dp)
                     ) {
-                        for (i in 0 until 3) {
-                            val checked = i == selectedIndex
+                        for (i in 0 until status.size) {
+                            val checked = i == selectedStatusIndex
 
                             this.toggleableItem(
                                 checked = checked,
                                 label = status[i],
                                 weight = 1f,
                                 onCheckedChange = {
-                                    if (i == selectedIndex) {
-                                        selectedIndex = -1
+                                    if (i == selectedStatusIndex) {
+                                        selectedStatusIndex = -1
                                     } else {
-                                        selectedIndex = i
+                                        selectedStatusIndex = i
                                     }
                                 }
                             )
@@ -230,7 +238,7 @@ fun CharactersListScreen(
                     }
 
                     Row(
-                        modifier = Modifier.padding( 12.dp),
+                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -256,19 +264,54 @@ fun CharactersListScreen(
                         }
                     }
 
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        ButtonGroup(
+                            overflowIndicator = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(6.dp)
+
+                        ) {
+                            for (i in 0 until gender.size) {
+                                val checked = i == selectedGenderIndex
+
+                                this.toggleableItem(
+                                    checked = checked,
+                                    label = gender[i],
+//                                    weight = 1f,
+                                    onCheckedChange = {
+                                        if (i == selectedGenderIndex) {
+                                            selectedGenderIndex = -1
+                                        } else {
+                                            selectedGenderIndex = i
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+
                     Button(onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 showBottomSheet = false
                                 viewModel.searchByFilter(
                                     name = name,
-                                    status = if (selectedIndex in 0 until status.size) {
-                                        status[selectedIndex]
+                                    status = if (selectedStatusIndex in 0 until status.size) {
+                                        status[selectedStatusIndex]
                                     } else {
                                         ""
                                     },
                                     species = species,
-                                    type = type
+                                    type = type,
+                                    gender = if (selectedGenderIndex in 0 until gender.size) {
+                                        gender[selectedGenderIndex]
+                                    } else {
+                                        ""
+                                    }
                                 )
                             }
                         }

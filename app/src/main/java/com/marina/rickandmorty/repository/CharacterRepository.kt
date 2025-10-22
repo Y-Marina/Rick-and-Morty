@@ -60,10 +60,11 @@ class CharacterRepository @Inject constructor(
         name: String,
         status: String,
         species: String,
-        type: String
+        type: String,
+        gender: String
     ): Resource<CharactersList> {
         val response = try {
-            api.getCharacterList(page, name, status, species, type).toCharacterList()
+            api.getCharacterList(page, name, status, species, type, gender).toCharacterList()
         } catch (e: Exception) {
             return Resource.Error(e.message.toString())
         }
