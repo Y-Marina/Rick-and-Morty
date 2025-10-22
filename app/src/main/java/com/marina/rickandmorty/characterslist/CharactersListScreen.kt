@@ -87,6 +87,10 @@ fun CharactersListScreen(
         mutableStateOf("")
     }
 
+    var type by remember {
+        mutableStateOf("")
+    }
+
     Scaffold(
         floatingActionButton = {
             SmallFloatingActionButton(
@@ -148,7 +152,7 @@ fun CharactersListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp),
+                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -199,7 +203,7 @@ fun CharactersListScreen(
                     }
 
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp),
+                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -225,6 +229,33 @@ fun CharactersListScreen(
                         }
                     }
 
+                    Row(
+                        modifier = Modifier.padding( 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "type",
+                            fontSize = 22.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(modifier = Modifier) {
+                            BasicTextField(
+                                value = type,
+                                onValueChange = {
+                                    type = it
+                                },
+                                maxLines = 1,
+                                singleLine = true,
+                                textStyle = TextStyle(color = Color.Black),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .shadow(5.dp, CircleShape)
+                                    .background(Color.White, CircleShape)
+                                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+
                     Button(onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
@@ -236,7 +267,8 @@ fun CharactersListScreen(
                                     } else {
                                         ""
                                     },
-                                    species = species
+                                    species = species,
+                                    type = type
                                 )
                             }
                         }

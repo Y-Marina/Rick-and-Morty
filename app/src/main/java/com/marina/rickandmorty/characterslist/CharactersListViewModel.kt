@@ -60,11 +60,12 @@ class CharactersListViewModel @Inject constructor(
     fun loadCharacterPaginated(
         name: String = "",
         status: String = "",
-        species: String = ""
+        species: String = "",
+        type: String = ""
     ) {
         viewModelScope.launch {
             isLoading.value = true
-            val result = repository.getCharacterList(curPage, name, status, species)
+            val result = repository.getCharacterList(curPage, name, status, species, type)
             when (result) {
                 is Resource.Success -> {
                     endReached.value = curPage * PAGE_SIZE >= result.data!!.info.count
@@ -92,7 +93,8 @@ class CharactersListViewModel @Inject constructor(
     fun searchByFilter(
         name: String = "",
         status: String = "",
-        species: String = ""
+        species: String = "",
+        type: String = ""
     ) {
         curPage = 1
         charactersList.value = emptyList()
