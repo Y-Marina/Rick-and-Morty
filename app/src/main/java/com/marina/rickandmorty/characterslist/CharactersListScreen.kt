@@ -36,6 +36,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,9 +74,12 @@ fun CharactersListScreen(
     navController: NavController,
     viewModel: CharactersListViewModel = hiltViewModel<CharactersListViewModel>()
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val isLoading by remember { viewModel.isLoading }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    val p2rState = rememberPullToRefreshState()
 
     var name by remember {
         mutableStateOf("")
@@ -122,29 +128,50 @@ fun CharactersListScreen(
             color = MaterialTheme.colorScheme.background,
             modifier = Modifier.fillMaxSize()
         ) {
-            Column {
-                Image(
-                    painter = painterResource(id = R.drawable.rick_and_morty_logo),
-                    contentDescription = "Rick_and_Morty",
-                    modifier = Modifier
-                        .padding(top = innerPadding.calculateTopPadding())
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                )
-                SearchBar(
-                    hint = "Search...",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    viewModel.searchCharacter(it)
+            PullToRefreshBox(
+                isRefreshing = isLoading,
+                onRefresh = {
+                    println("MyTag onRefresh")
+                    viewModel.loadCharacterPaginated()
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding()), // снизу наш навбар!
+                state = p2rState,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = p2rState,
+                        isRefreshing = isLoading,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        containerColor = MaterialTheme.colorScheme.background,
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                CharactersList(
-                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
-                    navController = navController
-                )
+            ) {
+                Column {
+                    Image(
+                        painter = painterResource(id = R.drawable.rick_and_morty_logo),
+                        contentDescription = "Rick_and_Morty",
+                        modifier = Modifier
+                            .padding(top = innerPadding.calculateTopPadding())
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
+                    )
+                    SearchBar(
+                        hint = "Search...",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        viewModel.searchCharacter(it)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CharactersList(
+                        modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                        navController = navController
+                    )
 
+                }
             }
         }
         if (showBottomSheet) {
@@ -156,7 +183,8 @@ fun CharactersListScreen(
             ) {
                 // Sheet content
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
@@ -280,7 +308,6 @@ fun CharactersListScreen(
                                 this.toggleableItem(
                                     checked = checked,
                                     label = gender[i],
-//                                    weight = 1f,
                                     onCheckedChange = {
                                         if (i == selectedGenderIndex) {
                                             selectedGenderIndex = -1
@@ -294,7 +321,9 @@ fun CharactersListScreen(
                     }
 
 
-                    Button(onClick = {
+                    Button(
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 showBottomSheet = false
@@ -316,7 +345,10 @@ fun CharactersListScreen(
                             }
                         }
                     }) {
-                        Text("применить")
+                        Text(
+                            text = "применить",
+                            fontSize = 16.sp
+                        )
                     }
                 }
 
