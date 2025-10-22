@@ -1,6 +1,5 @@
 package com.marina.rickandmorty.characterslist
 
-import android.widget.EditText
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,22 +23,21 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,7 +63,7 @@ import com.marina.rickandmorty.R
 import com.marina.rickandmorty.data.models.Character
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CharactersListScreen(
     navController: NavController,
@@ -78,6 +76,17 @@ fun CharactersListScreen(
     var name by remember {
         mutableStateOf("")
     }
+
+    var selectedIndex by remember {
+        mutableIntStateOf(-1)
+    }
+
+    val status = listOf("alive", "dead", "unknown")
+
+    var species by remember {
+        mutableStateOf("")
+    }
+
     Scaffold(
         floatingActionButton = {
             SmallFloatingActionButton(
@@ -90,7 +99,9 @@ fun CharactersListScreen(
                 Image(
                     painter = painterResource(R.drawable.filters),
                     contentDescription = "filters",
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 )
             }
         }
@@ -163,11 +174,70 @@ fun CharactersListScreen(
                         }
                     }
 
+                    ButtonGroup(
+                        overflowIndicator = {},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(6.dp)
+                    ) {
+                        for (i in 0 until 3) {
+                            val checked = i == selectedIndex
+
+                            this.toggleableItem(
+                                checked = checked,
+                                label = status[i],
+                                weight = 1f,
+                                onCheckedChange = {
+                                    if (i == selectedIndex) {
+                                        selectedIndex = -1
+                                    } else {
+                                        selectedIndex = i
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "species",
+                            fontSize = 22.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(modifier = Modifier) {
+                            BasicTextField(
+                                value = species,
+                                onValueChange = {
+                                    species = it
+                                },
+                                maxLines = 1,
+                                singleLine = true,
+                                textStyle = TextStyle(color = Color.Black),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .shadow(5.dp, CircleShape)
+                                    .background(Color.White, CircleShape)
+                                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+
                     Button(onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 showBottomSheet = false
-                                viewModel.searchByFilter(name)
+                                viewModel.searchByFilter(
+                                    name = name,
+                                    status = if (selectedIndex in 0 until status.size) {
+                                        status[selectedIndex]
+                                    } else {
+                                        ""
+                                    },
+                                    species = species
+                                )
                             }
                         }
                     }) {

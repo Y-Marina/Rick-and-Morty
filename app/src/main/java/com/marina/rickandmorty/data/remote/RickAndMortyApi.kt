@@ -10,7 +10,9 @@ interface RickAndMortyApi {
     @GET("character")
     suspend fun getCharacterList(
         @Query("page") page: Int,
-        @Query("name") name: String = ""
+        @Query("name") name: String = "",
+        @Query("status") status: String = "",
+        @Query("species") species: String = ""
     ): CharactersListDto
 
     @GET("character/{id}")
