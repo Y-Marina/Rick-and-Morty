@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.com.squareup.logging.interceptor)
 
     implementation(libs.coil.compose)
+    implementation(libs.coil.compose.core)
     implementation(libs.coil.network)
     implementation(libs.com.google.accompanist)
 

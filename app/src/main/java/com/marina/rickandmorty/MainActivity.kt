@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     val navController = rememberNavController()
                     NavHost(
-                        modifier = Modifier.padding(innerPadding),
+//                        modifier = Modifier.padding(innerPadding),
                         navController = navController,
                         startDestination = "characters_list_screen"
                     ) {

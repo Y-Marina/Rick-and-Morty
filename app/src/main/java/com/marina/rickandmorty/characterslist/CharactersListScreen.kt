@@ -1,5 +1,6 @@
 package com.marina.rickandmorty.characterslist
 
+import android.widget.EditText
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -21,15 +24,25 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,37 +63,122 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.marina.rickandmorty.R
 import com.marina.rickandmorty.data.models.Character
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersListScreen(
     navController: NavController,
     viewModel: CharactersListViewModel = hiltViewModel<CharactersListViewModel>()
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column {
-            Spacer(modifier = Modifier.height(20.dp))
-            Image(
-                painter = painterResource(id = R.drawable.rick_and_morty_logo),
-                contentDescription = "Rick_and_Morty",
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    var name by remember {
+        mutableStateOf("")
+    }
+    Scaffold(
+        floatingActionButton = {
+            SmallFloatingActionButton(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
-            )
-            SearchBar(
-                hint = "Search...",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .clip(shape = CircleShape)
+                    .size(60.dp),
+                containerColor = Color.Gray,
+                onClick = { showBottomSheet = true }
             ) {
-                viewModel.searchCharacter(it)
+                Image(
+                    painter = painterResource(R.drawable.filters),
+                    contentDescription = "filters",
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            CharactersList(navController)
+        }
+    ) { innerPadding ->
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column {
+                Image(
+                    painter = painterResource(id = R.drawable.rick_and_morty_logo),
+                    contentDescription = "Rick_and_Morty",
+                    modifier = Modifier
+                        .padding(top = innerPadding.calculateTopPadding())
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                )
+                SearchBar(
+                    hint = "Search...",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    viewModel.searchCharacter(it)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                CharactersList(
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+                    navController = navController
+                )
+
+            }
+        }
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                // Sheet content
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "name",
+                            fontSize = 22.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(modifier = Modifier) {
+                            BasicTextField(
+                                value = name,
+                                onValueChange = {
+                                    name = it
+                                },
+                                maxLines = 1,
+                                singleLine = true,
+                                textStyle = TextStyle(color = Color.Black),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .shadow(5.dp, CircleShape)
+                                    .background(Color.White, CircleShape)
+                                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+
+                    Button(onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                                viewModel.searchByFilter(name)
+                            }
+                        }
+                    }) {
+                        Text("применить")
+                    }
+                }
+
+            }
         }
     }
+
 }
 
 @Composable
@@ -128,6 +226,7 @@ fun SearchBar(
 
 @Composable
 fun CharactersList(
+    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: CharactersListViewModel = hiltViewModel<CharactersListViewModel>()
 ) {
@@ -144,6 +243,7 @@ fun CharactersList(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(
+            modifier = modifier,
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -185,6 +285,7 @@ fun CharactersList(
                 }
             }
         }
+
     }
 }
 
@@ -228,7 +329,7 @@ fun CharactersEntry(
                         isLoading = true
                     },
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .fillMaxSize()
                 )
                 Box(
                     modifier = Modifier

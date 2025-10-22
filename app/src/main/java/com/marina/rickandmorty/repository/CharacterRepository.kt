@@ -55,9 +55,12 @@ private fun LocationDto.toLocation() = Location(
 class CharacterRepository @Inject constructor(
     private val api: RickAndMortyApi
 ) {
-    suspend fun getCharacterList(page: Int): Resource<CharactersList> {
+    suspend fun getCharacterList(
+        page: Int,
+        name: String
+    ): Resource<CharactersList> {
         val response = try {
-            api.getCharacterList(page).toCharacterList()
+            api.getCharacterList(page, name).toCharacterList()
         } catch (e: Exception) {
             return Resource.Error(e.message.toString())
         }

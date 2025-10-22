@@ -57,10 +57,10 @@ class CharactersListViewModel @Inject constructor(
         }
     }
 
-    fun loadCharacterPaginated() {
+    fun loadCharacterPaginated(name: String = "") {
         viewModelScope.launch {
             isLoading.value = true
-            val result = repository.getCharacterList(curPage)
+            val result = repository.getCharacterList(curPage, name)
             when (result) {
                 is Resource.Success -> {
                     endReached.value = curPage * PAGE_SIZE >= result.data!!.info.count
@@ -83,5 +83,13 @@ class CharactersListViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun searchByFilter(
+        name: String = ""
+    ) {
+        curPage = 1
+        charactersList.value = emptyList()
+        loadCharacterPaginated(name)
     }
 }
